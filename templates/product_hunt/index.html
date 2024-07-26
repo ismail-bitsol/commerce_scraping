@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="shortcut icon" type="image/jpg" href="static/assets/images/favicon.ico"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Comparison</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+        #search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #search-query {
+            width: 60%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #search-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+        }
+        #results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #results-table th, #results-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        #results-table th {
+            background-color: #f2f2f2;
+        }
+        #best-product {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e2e2e2;
+            border-radius: 5px;
+        }
+        .product-image {
+            width: 100px;
+            height: auto;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .popup h3 {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="search-container">
+            <input type="text" id="search-query" placeholder="Enter product name">
+            <button id="search-btn">Search</button>
+        </div>
+
+        <div id="loading">Loading...</div>
+
+        <div class="popup" id="popup">
+            <h3>Scraping in Progress</h3>
+            <p>Please wait while we fetch the latest data...</p>
+        </div>
+
+        <table id="results-table">
+            <thead>
+                <tr>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Reviews</th>
+                    <th>Sentiment Score</th>
+                    <th>Sentiment Label</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here -->
+            </tbody>
+        </table>
+
+        <div id="best-product">
+            <!-- Best product information will be inserted here -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('search-btn').addEventListener('click', function() {
+            var keyword = document.getElementById('search-query').value;
+            if (!keyword) {
+                alert('Please enter a product name');
+                return;
+            }
+    
+            console.log(`Searching for keyword: ${keyword}`);
+            showLoading();
+    
+            checkKeywordInDatabase(keyword)
+                .then(function(products) {
+                    if (products.length === 0) {
+                        console.log('No products found in database. Starting scraping...');
+                        showPopup();
+                        return scrapeAndStore(keyword);
+                    } else {
+                        console.log('Products found in database.');
+                        scrapeAndStore(keyword)
+                        return products;
+                    }
+                })
+                .then(function(products) {
+                    hidePopup();
+                    hideLoading();
+                    if (products.length === 0) {
+                        alert('No products found');
+                    } else {
+                        displayResults(products);
+                    }
+                })
+                .catch(function(error) {
+                    hidePopup();
+                    hideLoading();
+                    alert('An error occurred while fetching data. Please try again later.');
+                    console.error('Error:', error);
+                });
+        });
+    
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results-table').style.display = 'none';
+            document.getElementById('best-product').style.display = 'none';
+        }
+    
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+    
+        function showPopup() {
+            document.getElementById('popup').style.display = 'block';
+        }
+    
+        function hidePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+    
+        function checkKeywordInDatabase(keyword) {
+            return axios.get(`/product_hunt/api/get_keyword_data/?keyword=${keyword}`)
+                .then(function(response) {
+                    console.log('Database response:', response.data);
+                    return response.data;
+                });
+        }
+    
+        function scrapeAndStore(keyword) {
+            return axios.post('/product_hunt/api/scrape_and_store/', { keyword: keyword })
+                .then(function(response) {
+                    console.log('Scraping response:', response.data);
+                    return response.data;
+                });
+        }
+    
+        function displayResults(products) {
+            var resultsTableBody = document.querySelector('#results-table tbody');
+            resultsTableBody.innerHTML = '';
+    
+            products.forEach(function(product) {
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${product.image_url}" alt="${product.name}" class="product-image"></td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.reviews}</td>
+                    <td>${product.sentiment_score}</td>
+                    <td>${product.sentiment_label}</td>
+                `;
+                resultsTableBody.appendChild(row);
+            });
+    
+            document.getElementById('results-table').style.display = 'table';
+    
+            var bestProduct = products.reduce(function(prev, current) {
+                return (prev.sentiment_score - prev.price) > (current.sentiment_score - current.price) ? prev : current;
+            });
+    
+            var bestProductDiv = document.getElementById('best-product');
+            bestProductDiv.innerHTML = `
+                <h3>Best Product</h3>
+                <img src="${bestProduct.image_url}" alt="${bestProduct.name}" class="product-image">
+                <p><strong>Name:</strong> ${bestProduct.name}</p>
+                <p><strong>Website:</strong> ${bestProduct.product_url}</p>
+                <p><strong>Price:</strong> ${bestProduct.price}</p>
+                <p><strong>Reviews:</strong> ${bestProduct.reviews}</p>
+                <p><strong>Sentiment Score:</strong> ${bestProduct.sentiment_score}</p>
+                <p><strong>Sentiment Label:</strong> ${bestProduct.sentiment_label}</p>
+            `;
+            bestProductDiv.style.display = 'block';
+        }
+    </script>
+    
+    
+</body>
+</html>

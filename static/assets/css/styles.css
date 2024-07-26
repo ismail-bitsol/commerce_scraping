@@ -1,0 +1,180 @@
+
+
+/* product_hunt/style.css */
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.logo {
+    width: 50px;
+    margin-right: 20px;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.search-container input {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-container button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.search-container button:hover {
+    background-color: #0056b3;
+}
+
+#results {
+    margin: 20px;
+}
+
+
+header .logo {
+    max-height: 50px;
+}
+
+main {
+    padding: 20px;
+    text-align: center;
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+#search-query {
+    padding: 10px;
+    width: 300px;
+    margin-right: 10px;
+}
+
+#search-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+#search-button:hover {
+    background-color: #0056b3;
+}
+
+#loading {
+    font-size: 18px;
+    color: #007bff;
+}
+
+#error-message {
+    font-size: 18px;
+    color: #ff0000;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.hidden {
+    display: none;
+}
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    padding: 20px;
+}
+#search-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+#search-query {
+    width: 60%;
+    padding: 10px;
+    font-size: 16px;
+}
+#search-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+#loading {
+    display: none;
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+    margin-top: 20px;
+}
+#results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+#results-table th, #results-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+#results-table th {
+    background-color: #f2f2f2;
+}
+#best-product {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #e2e2e2;
+    border-radius: 5px;
+}
+
+
+/* product_hunt/static/product_hunt/styles.css */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header .logo {
+    max-height: 60px; /* Adjust this value based on your design */
+    margin-right: 20px; /* Space between logo and header text */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size if needed */
+}
